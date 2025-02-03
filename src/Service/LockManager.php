@@ -14,15 +14,12 @@ use Symfony\Component\Lock\LockInterface;
 
 class LockManager
 {
-    private LockFactory $lockFactory;
-    private Repository $config;
-
     private static LockCollection $lockCollection;
 
-    public function __construct(LockFactory $lockFactory, Repository $config)
-    {
-        $this->lockFactory = $lockFactory;
-        $this->config = $config;
+    public function __construct(
+        private readonly LockFactory $lockFactory,
+        private readonly Repository $config
+    ) {
         self::$lockCollection ??= new LockCollection();
     }
 
@@ -64,7 +61,12 @@ class LockManager
 
     private function createSymfonyLock(string $key): LockInterface
     {
-        $appName = Validator::make($this->config->get('app.name'))->string()->notNull();
-        return $this->lockFactory->createLock($appName.$key, null, true);
+        $keyPrefix = Validator::make($this->config->get('lock.prefix'))->string()->nullable()
+            ??
+            Validator::make($this->config->get('app.name'))->string()->nullable()
+            ??
+            ''
+        ;
+        return $this->lockFactory->createLock($keyPrefix.$key, null, true);
     }
 }

@@ -8,4 +8,6 @@ return [
     'pgsql_store' => [
         'connection' => env('LOCK_PGSQL_STORE_CONNECTION'),
     ],
+
+    'prefix' => env('LOCK_PREFIX'),
 ];
