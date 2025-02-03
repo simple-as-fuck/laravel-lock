@@ -18,7 +18,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer install --no-interaction
+        run: composer update --no-interaction --prefer-lowest
 
       - name: Chesk code style
         run: tools/php-cs-fixer fix --dry-run --no-interaction
@@ -41,7 +41,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.6.0
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.6.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -61,7 +61,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.5.0 --with illuminate/contracts:^10.0
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.5.0 --with illuminate/contracts:^10.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse --configuration=phpstan-validator-0.5.neon.dist
@@ -81,7 +81,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer install --no-interaction
+        run: composer update --no-interaction --prefer-lowest
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -98,7 +98,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.2.0
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.2.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.3.0
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.3.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -132,7 +132,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.4.0 --with illuminate/contracts:^9.0 --with symfony/lock:^6.0.7
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.4.0 --with illuminate/contracts:^9.0 --with symfony/lock:^6.0.7
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -149,7 +149,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.1.0 --with illuminate/contracts:^8.0 --with symfony/lock:^5.4.7
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.1.0 --with illuminate/contracts:^8.0 --with symfony/lock:^5.4.7
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -166,7 +166,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer install --no-interaction
+        run: composer update --no-interaction --prefer-lowest
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
