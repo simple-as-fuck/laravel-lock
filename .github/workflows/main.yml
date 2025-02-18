@@ -18,7 +18,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest
+        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^7.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^11.0
 
       - name: Chesk code style
         run: tools/php-cs-fixer fix --dry-run --no-interaction
