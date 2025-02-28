@@ -9,10 +9,13 @@ use Illuminate\Support\ServiceProvider;
 use SimpleAsFuck\LaravelLock\Factory\FlockFactory;
 use SimpleAsFuck\LaravelLock\Factory\PostgreSqlFactory;
 use SimpleAsFuck\LaravelLock\Factory\SemaphoreFactory;
-use SimpleAsFuck\LaravelLock\Factory\StoreFactory;
 use SimpleAsFuck\LaravelLock\Service\LockManager;
 use SimpleAsFuck\Validator\Factory\Validator;
+use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\Store\CombinedStore;
+use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 class PackageProvider extends ServiceProvider
 {
@@ -23,25 +26,59 @@ class PackageProvider extends ServiceProvider
         $this->app->singleton(LockFactory::class, function (): LockFactory {
             /** @var Repository $config */
             $config = $this->app->make(Repository::class);
-            $storeName = Validator::make($config->get('lock.store'))->string()->notNull();
+            $lockConfiguration = Validator::make($config->get('lock'), 'Config lock')->array();
+            $storeName = $lockConfiguration->key('store')
+                ->string()
+                ->in(['semaphore', 'flock', 'pgsql'])
+                ->notNull()
+            ;
+            $storeConfiguration = $lockConfiguration->key($storeName.'_store')->array();
+            $store = $this->makeStore($storeName, $storeConfiguration);
 
-            /** @var array<string, StoreFactory> $storeFactories */
-            $storeFactories = [
-                'semaphore' => new SemaphoreFactory(),
-                'flock' => new FlockFactory(),
-                'pgsql' => $this->app->make(PostgreSqlFactory::class),
-            ];
+            $oldStoreName = $lockConfiguration->key('old_store')
+                ->string()
+                ->in(['semaphore', 'flock', 'pgsql'])
+                ->nullable()
+            ;
+            if ($oldStoreName !== null) {
+                $oldStoreConfiguration = $lockConfiguration->key('old_' . $storeName . '_store')->array();
+                $storeConfigurationValue = $storeConfiguration->nullable() ?? [];
+                $oldStoreConfigurationValue = $oldStoreConfiguration->nullable() ?? [];
 
-            if (! array_key_exists($storeName, $storeFactories)) {
-                throw new \RuntimeException('Factory for lock store: "'.$storeName.'" not found, check "LOCK_STORE" env value or "lock.store" config value');
+                ksort($storeConfigurationValue);
+                ksort($oldStoreConfigurationValue);
+
+                if ($storeName !== $oldStoreName || $storeConfigurationValue !== $oldStoreConfigurationValue) {
+                    $oldStore = $this->makeStore($oldStoreName, $oldStoreConfiguration);
+                    $store = new CombinedStore([$store, $oldStore], new UnanimousStrategy());
+                }
             }
 
-            return new LockFactory($storeFactories[$storeName]->make());
+            return new LockFactory($store);
         });
     }
 
     public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/lock.php', 'lock');
+    }
+
+    /**
+     * @param 'semaphore'|'flock'|'pgsql' $storeName
+     */
+    private function makeStore(
+        string $storeName,
+        ArrayRule $storeConfiguration,
+    ): PersistingStoreInterface {
+        if ($storeName === 'pgsql') {
+            /** @var PostgreSqlFactory $postgreSqlFactory */
+            $postgreSqlFactory = $this->app->make(PostgreSqlFactory::class);
+            return $postgreSqlFactory->make($storeConfiguration);
+        }
+
+        return match($storeName) {
+            'semaphore' => (new SemaphoreFactory())->make(),
+            'flock' => (new FlockFactory())->make(),
+        };
     }
 }

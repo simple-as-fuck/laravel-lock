@@ -29,28 +29,8 @@ jobs:
       - name: Run tests
         run: tools/phpunit test/ --bootstrap vendor/autoload.php
 
-  php83b:
-    name: "php 8.3, validator 0.6"
-    runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.3"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install tools
-        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
-
-      - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.6.0
-
-      - name: Run static analysis
-        run: vendor/bin/phpstan analyse
-
-      - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
-
   php83a:
-    name: "php 8.3, laravel 10.0, validator 0.5"
+    name: "php 8.3, laravel 10.0, validator 0.6"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.3"
     steps:
@@ -61,7 +41,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.5.0 --with illuminate/contracts:^10.0
+        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.6.0 --with illuminate/contracts:^10.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -89,42 +69,8 @@ jobs:
       - name: Run tests
         run: tools/phpunit test/ --bootstrap vendor/autoload.php
 
-  php81b:
-    name: "php 8.1, validator 0.2"
-    runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.1"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.2.0
-
-      - name: Run static analysis
-        run: vendor/bin/phpstan analyse
-
-      - name: Run tests
-        run: vendor/bin/phpunit test/
-
-  php81c:
-    name: "php 8.1, validator 0.3"
-    runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.1"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.3.0
-
-      - name: Run static analysis
-        run: vendor/bin/phpstan analyse
-
-      - name: Run tests
-        run: vendor/bin/phpunit test/
-
   php81d:
-    name: "php 8.1, validator 0.4, laravel 9.0, symfony 6.0"
+    name: "php 8.1, laravel 9.0, symfony 6.0"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.1"
     steps:
@@ -132,7 +78,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.4.0 --with illuminate/contracts:^9.0 --with symfony/lock:^6.0.7
+        run: composer update --no-interaction --prefer-lowest --with illuminate/contracts:^9.0 --with symfony/lock:^6.0.7
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -141,7 +87,7 @@ jobs:
         run: vendor/bin/phpunit test/
 
   php81a:
-    name: "php 8.1, validator 0.1, laravel 8.0, symfony 5.3"
+    name: "php 8.1, laravel 8.0, symfony 5.3"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.1"
     steps:
@@ -149,7 +95,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.1.0 --with illuminate/contracts:^8.0 --with symfony/lock:^5.4.7
+        run: composer update --no-interaction --prefer-lowest --with illuminate/contracts:^8.0 --with symfony/lock:^5.4.7
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse

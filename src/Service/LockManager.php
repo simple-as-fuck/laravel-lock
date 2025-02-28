@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SimpleAsFuck\LaravelLock\Service;
 
 use Illuminate\Contracts\Config\Repository;
+use SimpleAsFuck\LaravelLock\Model\ArrayLock;
 use SimpleAsFuck\LaravelLock\Model\FakeLock;
 use SimpleAsFuck\LaravelLock\Model\Lock;
 use SimpleAsFuck\LaravelLock\Model\LockCollection;
@@ -61,12 +62,31 @@ class LockManager
 
     private function createSymfonyLock(string $key): LockInterface
     {
-        $keyPrefix = Validator::make($this->config->get('lock.prefix'))->string()->nullable()
+        $lockConfiguration = Validator::make($this->config->get('lock'), 'Config lock')->array();
+        $appConfiguration = Validator::make($this->config->get('app'), 'Config app')->array();
+
+        $keyPrefix = $lockConfiguration->key('prefix')->string()->nullable()
             ??
-            Validator::make($this->config->get('app.name'))->string()->nullable()
+            $appConfiguration->key('name')->string()->nullable()
             ??
             ''
         ;
+        if ($lockConfiguration->key('old_store')->nullable() !== null) {
+            $oldKeyPrefix = $lockConfiguration->key('old_prefix')->string()->nullable()
+                ??
+                $appConfiguration->key('name')->string()->nullable()
+                ??
+                ''
+            ;
+
+            if ($keyPrefix !== $oldKeyPrefix) {
+                return new ArrayLock([
+                    $this->lockFactory->createLock($keyPrefix.$key, null, true),
+                    $this->lockFactory->createLock($oldKeyPrefix.$key, null, true),
+                ]);
+            }
+        }
+
         return $this->lockFactory->createLock($keyPrefix.$key, null, true);
     }
 }

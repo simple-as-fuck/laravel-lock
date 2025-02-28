@@ -17,7 +17,7 @@ final class LockTest extends TestCase
     {
         $lockFactory = new LockFactory(new SemaphoreStore());
         $config = $this->createMock(Repository::class);
-        $config->method('get')->willReturn('test');
+        $config->method('get')->willReturn([]);
 
         $this->lockManager = new LockManager($lockFactory, $config);
     }

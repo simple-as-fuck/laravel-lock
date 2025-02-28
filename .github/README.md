@@ -49,6 +49,31 @@ env sets prefix to empty string, simply turn off lock keys prefixing
 - `LOCK_PREFIX="some_prefix"`
 env sets custom prefix and override prefix from application name
 
+⚠ Changing lock configuration is [dangerous operation](https://symfony.com/doc/current/components/lock.html#overall). ⚠
+
+If you need change lock store, you can use environment variables with `OLD_` prefix.
+
+```dotenv
+OLD_LOCK_STORE=semaphore
+OLD_LOCK_PREFIX=null
+#OLD_LOCK_PGSQL_STORE_CONNECTION=null
+```
+
+- For save configuration change copy your current lock configuration
+and prefix all environment keys with `OLD_` prefix,
+change basic environment variables with usage of new lock configuration.
+- Keep your application running with both configurations for a while.
+- After all processes with unchanged configuration ends or dies,
+remove all environment keys with `OLD_` prefix.
+
+⚠ If your change of multiple environment variables is not atomic operation,
+you should change variables in specific order. First create variables with `OLD_` prefix,
+`OLD_LOCK_STORE` create as last one, second if you need, prepare specific variables for specific store,
+third if you need, change `LOCK_PREFIX` at last if you need, change `LOCK_STORE`.
+While you cleaning `OLD_` prefix, remove `OLD_LOCK_STORE` as first.
+
+Is not recommended run application with old configuration for long time
+because locking with old store is less effective.
 
 ## Usage
 
