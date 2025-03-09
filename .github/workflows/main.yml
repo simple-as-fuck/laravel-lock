@@ -18,7 +18,7 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^7.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^11.0
+        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^7.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^12.0
 
       - name: Chesk code style
         run: tools/php-cs-fixer fix --dry-run --no-interaction
@@ -42,6 +42,26 @@ jobs:
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with simple-as-fuck/php-validator:^0.6.0 --with illuminate/contracts:^10.0
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse
+
+      - name: Run tests
+        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+
+  php83b:
+    name: "php 8.3, laravel 11.0"
+    runs-on: ubuntu-latest
+    container: "nofutur3/php-tests:8.3"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
+
+      - name: Install dependencies
+        run: composer update --no-interaction --prefer-lowest --with illuminate/contracts:^11.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
