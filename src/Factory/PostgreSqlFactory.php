@@ -13,16 +13,16 @@ use Symfony\Component\Lock\Store\PostgreSqlStore;
 
 final class PostgreSqlFactory extends StoreFactory
 {
-    private DatabaseManager $databaseManager;
-    private Repository $config;
-
-    public function __construct(DatabaseManager $databaseManager, Repository $config)
-    {
-        $this->databaseManager = $databaseManager;
-        $this->config = $config;
+    public function __construct(
+        private readonly DatabaseManager $databaseManager,
+        private readonly Repository $config
+    ) {
     }
 
-    public function make(ArrayRule $configuration = null): BlockingStoreInterface
+    /**
+     * @todo $configuration will be in 0.3 not null
+     */
+    public function make(?ArrayRule $configuration = null): BlockingStoreInterface
     {
         if ($configuration !== null) {
             $connectionName = $configuration->key('connection')->string()->nullable();
