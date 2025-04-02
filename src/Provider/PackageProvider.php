@@ -41,7 +41,7 @@ class PackageProvider extends ServiceProvider
                 ->nullable()
             ;
             if ($oldStoreName !== null) {
-                $oldStoreConfiguration = $lockConfiguration->key('old_' . $storeName . '_store')->array();
+                $oldStoreConfiguration = $lockConfiguration->key('old_' . $oldStoreName . '_store')->array();
                 $storeConfigurationValue = $storeConfiguration->nullable() ?? [];
                 $oldStoreConfigurationValue = $oldStoreConfiguration->nullable() ?? [];
 
