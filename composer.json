@@ -13,7 +13,8 @@
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^10.0",
-        "phpstan/phpstan-deprecation-rules": "^2.0"
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "spaze/phpstan-disallowed-calls": "^4.5"
     },
     "autoload": {
         "psr-4": {"SimpleAsFuck\\LaravelLock\\": "src/"}
