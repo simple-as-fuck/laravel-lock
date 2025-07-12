@@ -24,7 +24,7 @@ jobs:
         run: vendor/bin/phpstan analyse
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php83:
     name: "php 8.3"
@@ -47,7 +47,7 @@ jobs:
         run: vendor/bin/phpstan analyse
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php83a:
     name: "php 8.3, laravel 10.0, validator 0.6"
@@ -67,7 +67,7 @@ jobs:
         run: vendor/bin/phpstan analyse
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php83b:
     name: "php 8.3, laravel 11.0"
@@ -87,7 +87,7 @@ jobs:
         run: vendor/bin/phpstan analyse
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php82:
     name: "php 8.2"
@@ -107,12 +107,12 @@ jobs:
         run: vendor/bin/phpstan analyse
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
-  php81d:
-    name: "php 8.1, laravel 9.0, symfony 6.0"
+  php82a:
+    name: "php 8.2, laravel 9.0, symfony 6.0"
     runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.1"
+    container: "nofutur3/php-tests:8.2"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -126,33 +126,16 @@ jobs:
       - name: Run tests
         run: vendor/bin/phpunit test/
 
-  php81a:
-    name: "php 8.1, laravel 8.0, symfony 5.3"
+  php82b:
+    name: "php 8.2, laravel 8.0, symfony 5.3"
     runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.1"
+    container: "nofutur3/php-tests:8.2"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/contracts:^8.0 --with symfony/lock:^5.4.7
-
-      - name: Run static analysis
-        run: vendor/bin/phpstan analyse
-
-      - name: Run tests
-        run: vendor/bin/phpunit test/
-
-  php81:
-    name: "php 8.1"
-    runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.1"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
