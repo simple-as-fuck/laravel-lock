@@ -5,63 +5,94 @@ declare(strict_types=1);
 namespace SimpleAsFuck\LaravelLock\Service;
 
 use Illuminate\Contracts\Config\Repository;
-use SimpleAsFuck\LaravelLock\Model\ArrayLock;
-use SimpleAsFuck\LaravelLock\Model\FakeLock;
+use SimpleAsFuck\LaravelLock\Data\FakeLock;
+use SimpleAsFuck\LaravelLock\Data\ArrayLock;
 use SimpleAsFuck\LaravelLock\Model\Lock;
-use SimpleAsFuck\LaravelLock\Model\LockCollection;
 use SimpleAsFuck\Validator\Factory\Validator;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 
 class LockManager
 {
-    private static LockCollection $lockCollection;
+    /** @var \WeakMap<LockInterface, non-empty-string> */
+    private static \WeakMap $locksMap;
 
     public function __construct(
         private readonly LockFactory $lockFactory,
         private readonly Repository $config
     ) {
-        self::$lockCollection ??= new LockCollection();
+        /** @var \WeakMap<LockInterface, non-empty-string> $weakMap */
+        $weakMap = new \WeakMap();
+        self::$locksMap ??= $weakMap;
     }
 
     /**
      * method will wait for unlocked key by another process and always return successfully acquired lock
+     * @param non-empty-string $key
      */
     public function acquire(string $key): Lock
     {
         $lock = $this->createSymfonyLock($key);
-        if (self::$lockCollection->hasAcquired($key)) {
-            return new FakeLock($lock);
-        }
 
         $lock->acquire(true);
 
-        $lock = new Lock($lock, self::$lockCollection);
-        self::$lockCollection->put($key, $lock);
-        return $lock;
+        return new Lock($lock);
     }
 
     /**
      * method will try to acquire lock for key, if key is in current time locked by another process return null
+     * @param non-empty-string $key
      */
     public function acquireNotBlocking(string $key): ?Lock
     {
         $lock = $this->createSymfonyLock($key);
-        if (self::$lockCollection->hasAcquired($key)) {
-            return new FakeLock($lock);
-        }
 
         if (! $lock->acquire(false)) {
             return null;
         }
 
-        $lock = new Lock($lock, self::$lockCollection);
-        self::$lockCollection->put($key, $lock);
-        return $lock;
+        return new Lock($lock);
     }
 
+    /**
+     * @param non-empty-array<non-empty-string> $keys
+     */
+    public function acquireMultiple(array $keys): Lock
+    {
+        \sort($keys, \SORT_STRING);
+        $lock = new ArrayLock(\array_map(fn (string $key): LockInterface => $this->createSymfonyLock($key), $keys));
+
+        $lock->acquire(true);
+
+        return new Lock($lock);
+    }
+
+    /**
+     * @param non-empty-array<non-empty-string> $keys
+     */
+    public function acquireMultipleNotBlocking(array $keys): ?Lock
+    {
+        \sort($keys, \SORT_STRING);
+        $lock = new ArrayLock(\array_map(fn (string $key): LockInterface => $this->createSymfonyLock($key), $keys));
+
+        if (! $lock->acquire(false)) {
+            return null;
+        }
+
+        return new Lock($lock);
+    }
+
+    /**
+     * @param non-empty-string $key
+     */
     private function createSymfonyLock(string $key): LockInterface
     {
+        foreach (self::$locksMap as $lock => $lockedKey) {
+            if ($lockedKey === $key && $lock->isAcquired()) {
+                return new FakeLock();
+            }
+        }
+
         $lockConfiguration = Validator::make($this->config->get('lock'), 'Config lock')->array();
         $appConfiguration = Validator::make($this->config->get('app'), 'Config app')->array();
 
@@ -80,13 +111,17 @@ class LockManager
             ;
 
             if ($keyPrefix !== $oldKeyPrefix) {
-                return new ArrayLock([
+                $lock = new ArrayLock([
                     $this->lockFactory->createLock($keyPrefix.$key, null, true),
                     $this->lockFactory->createLock($oldKeyPrefix.$key, null, true),
                 ]);
+                self::$locksMap[$lock] = $key;
+                return $lock;
             }
         }
 
-        return $this->lockFactory->createLock($keyPrefix.$key, null, true);
+        $lock = $this->lockFactory->createLock($keyPrefix.$key, null, true);
+        self::$locksMap[$lock] = $key;
+        return $lock;
     }
 }

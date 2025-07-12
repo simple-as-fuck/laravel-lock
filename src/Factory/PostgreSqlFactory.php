@@ -4,32 +4,21 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\LaravelLock\Factory;
 
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\DatabaseManager;
-use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Store\PostgreSqlStore;
 
-final class PostgreSqlFactory extends StoreFactory
+final readonly class PostgreSqlFactory
 {
     public function __construct(
-        private readonly DatabaseManager $databaseManager,
-        private readonly Repository $config
+        private DatabaseManager $databaseManager,
     ) {
     }
 
-    /**
-     * @todo $configuration will be in 0.3 not null
-     */
-    public function make(?ArrayRule $configuration = null): BlockingStoreInterface
+    public function make(ArrayRule $configuration): BlockingStoreInterface
     {
-        if ($configuration !== null) {
-            $connectionName = $configuration->key('connection')->string()->nullable();
-        } else {
-            $connectionName = Validator::make($this->config->get('lock.pgsql_store.connection'))->string()->nullable();
-        }
-
+        $connectionName = $configuration->key('connection')->string()->nullable();
         $connection = $this->databaseManager->connection($connectionName);
 
         if ($connection->getDriverName() !== 'pgsql') {

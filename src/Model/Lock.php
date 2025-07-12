@@ -8,13 +8,9 @@ use Symfony\Component\Lock\LockInterface;
 
 class Lock
 {
-    private LockInterface $lock;
-    private ?LockCollection $lockCollection;
-
-    public function __construct(LockInterface $lock, ?LockCollection $lockCollection = null)
-    {
-        $this->lock = $lock;
-        $this->lockCollection = $lockCollection;
+    public function __construct(
+        private readonly LockInterface $lock
+    ) {
     }
 
     public function __destruct()
@@ -26,10 +22,6 @@ class Lock
     {
         if ($this->lock->isAcquired()) {
             $this->lock->release();
-        }
-
-        if ($this->lockCollection !== null) {
-            $this->lockCollection->remove($this);
         }
     }
 

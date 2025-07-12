@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace SimpleAsFuck\LaravelLock\Model;
+namespace SimpleAsFuck\LaravelLock\Data;
 
 use Symfony\Component\Lock\LockInterface;
 
-final class ArrayLock implements LockInterface
+final readonly class ArrayLock implements LockInterface
 {
     /**
      * @param non-empty-array<LockInterface> $locks
      */
     public function __construct(
-        private readonly array $locks
+        private array $locks
     ) {
     }
 
