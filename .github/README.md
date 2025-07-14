@@ -78,10 +78,20 @@ because locking with old store is less effective.
 ## Usage
 
 ```php
-/** @var \SimpleAsFuck\LaravelLock\Service\LockManager $lockManager */
-$lockManager = app()->make(\SimpleAsFuck\LaravelLock\Service\LockManager::class);
+/**
+ * @var \Illuminate\Contracts\Foundation\Application $app
+ * @var \SimpleAsFuck\LaravelLock\Service\LockManager $lockManager
+ */
+$lockManager = $app->make(\SimpleAsFuck\LaravelLock\Service\LockManager::class);
 
 $lock = $lockManager->acquire('some_lock_key');
+try {
+    //happy run some critical code synchronously
+} finally {
+    $lock->release();
+}
+
+$lock = $lockManager->acquireMultiple(['some_lock_key', 'second_lock_key']);
 try {
     //happy run some critical code synchronously
 } finally {
