@@ -32,7 +32,7 @@ class LockManager
      */
     public function acquire(string $key): Lock
     {
-        $lock = $this->createSymfonyLock($key);
+        $lock = $this->makeSymfonyLock($key);
 
         $lock->acquire(true);
 
@@ -45,7 +45,7 @@ class LockManager
      */
     public function acquireNotBlocking(string $key): ?Lock
     {
-        $lock = $this->createSymfonyLock($key);
+        $lock = $this->makeSymfonyLock($key);
 
         if (! $lock->acquire(false)) {
             return null;
@@ -60,7 +60,7 @@ class LockManager
     public function acquireMultiple(array $keys): Lock
     {
         \sort($keys, \SORT_STRING);
-        $lock = new ArrayLock(\array_map(fn (string $key): LockInterface => $this->createSymfonyLock($key), $keys));
+        $lock = new ArrayLock(\array_map(fn (string $key): LockInterface => $this->makeSymfonyLock($key), $keys));
 
         $lock->acquire(true);
 
@@ -73,7 +73,7 @@ class LockManager
     public function acquireMultipleNotBlocking(array $keys): ?Lock
     {
         \sort($keys, \SORT_STRING);
-        $lock = new ArrayLock(\array_map(fn (string $key): LockInterface => $this->createSymfonyLock($key), $keys));
+        $lock = new ArrayLock(\array_map(fn (string $key): LockInterface => $this->makeSymfonyLock($key), $keys));
 
         if (! $lock->acquire(false)) {
             return null;
@@ -85,7 +85,7 @@ class LockManager
     /**
      * @param non-empty-string $key
      */
-    private function createSymfonyLock(string $key): LockInterface
+    private function makeSymfonyLock(string $key): LockInterface
     {
         foreach (self::$locksMap as $lock => $lockedKey) {
             if ($lockedKey === $key && $lock->isAcquired()) {
