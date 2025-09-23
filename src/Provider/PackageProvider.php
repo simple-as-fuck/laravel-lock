@@ -6,7 +6,6 @@ namespace SimpleAsFuck\LaravelLock\Provider;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\ServiceProvider;
-use SimpleAsFuck\LaravelLock\Factory\FlockFactory;
 use SimpleAsFuck\LaravelLock\Factory\PostgreSqlFactory;
 use SimpleAsFuck\LaravelLock\Service\LockManager;
 use SimpleAsFuck\Validator\Factory\Validator;
@@ -14,6 +13,7 @@ use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
+use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
@@ -78,7 +78,7 @@ class PackageProvider extends ServiceProvider
 
         return match($storeName) {
             'semaphore' => new SemaphoreStore(),
-            'flock' => (new FlockFactory())->make(),
+            'flock' => new FlockStore(sys_get_temp_dir().DIRECTORY_SEPARATOR.'php-locks'),
         };
     }
 }

@@ -7,6 +7,9 @@ namespace SimpleAsFuck\LaravelLock\Factory;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 
+/**
+ * @deprecated will be removed
+ */
 final readonly class FlockFactory
 {
     public function make(): BlockingStoreInterface
