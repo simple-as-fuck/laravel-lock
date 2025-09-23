@@ -15,7 +15,7 @@ final class LockTest extends TestCase
     protected function setUp(): void
     {
         $config = $this->createMock(Repository::class);
-        $config->method('get')->willReturnCallback(static function ($key) {
+        $config->method('get')->willReturnCallback(static function (string $key): ?array {
             $data = [
                 'lock' => [
                     'store' => 'semaphore',
