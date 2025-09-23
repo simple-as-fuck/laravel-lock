@@ -9,6 +9,9 @@ use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Store\PostgreSqlStore;
 
+/**
+ * @deprecated will be removed
+ */
 final readonly class PostgreSqlFactory
 {
     public function __construct(

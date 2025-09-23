@@ -3,11 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Database\DatabaseManager;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\LaravelLock\Model\Lock;
 use SimpleAsFuck\LaravelLock\Service\LockManager;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 
 final class LockTest extends TestCase
 {
@@ -15,11 +14,19 @@ final class LockTest extends TestCase
 
     protected function setUp(): void
     {
-        $lockFactory = new LockFactory(new SemaphoreStore());
         $config = $this->createMock(Repository::class);
-        $config->method('get')->willReturn([]);
+        $config->method('get')->willReturnCallback(static function ($key) {
+            $data = [
+                'lock' => [
+                    'store' => 'semaphore',
+                ],
+            ];
+            return $data[$key] ?? null;
+        });
 
-        $this->lockManager = new LockManager($lockFactory, $config);
+        $databaseManager = $this->createMock(DatabaseManager::class);
+
+        $this->lockManager = new LockManager(null, $config, $databaseManager);
     }
 
     public function testDuplicateRelease(): void
