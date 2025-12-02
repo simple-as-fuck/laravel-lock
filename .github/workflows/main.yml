@@ -21,7 +21,7 @@ jobs:
         run: tools/php-cs-fixer fix --dry-run --no-interaction
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^7.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^12.0
+        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^8.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^12.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
@@ -64,7 +64,7 @@ jobs:
         run: vendor/bin/phpunit test/
 
   php83b:
-    name: "php 8.3, laravel 11.0"
+    name: "php 8.3, laravel 11.0, symfony 7.0"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.3"
     steps:
@@ -72,7 +72,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with illuminate/contracts:^11.0
+        run: composer update --no-interaction --prefer-lowest --with illuminate/contracts:^11.0 --with symfony/lock:^7.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
