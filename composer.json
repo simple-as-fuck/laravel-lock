@@ -1,6 +1,7 @@
 {
     "name": "simple-as-fuck/laravel-lock",
     "description": "Laravel integration for symfony/lock.",
+    "license": "Unlicense",
     "require": {
         "php": "^8.2",
         "symfony/lock": "^5.4.7|^6.0.7|^7.0|^8.0",
