@@ -6,6 +6,26 @@ on:
       - "**"
 
 jobs:
+  php85:
+    name: "php 8.5"
+    runs-on: ubuntu-latest
+    container: "nofutur3/php-tests:8.5"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
+
+      - name: Install dependencies
+        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^8.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^13.0
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse
+
+      - name: Run tests
+        run: vendor/bin/phpunit test/
+
   php84:
     name: "php 8.4"
     runs-on: ubuntu-latest
@@ -21,7 +41,7 @@ jobs:
         run: tools/php-cs-fixer fix --dry-run --no-interaction
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with symfony/lock:^8.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/contracts:^13.0
+        run: composer update --no-interaction --prefer-lowest
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse
